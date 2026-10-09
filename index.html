@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Planilha de Controle Financeiro para MEI</title>
+<meta name="description" content="Planilha pronta para o MEI lançar entradas e saídas, separar o dinheiro da empresa do pessoal e acompanhar o limite anual de faturamento. Excel e Google Planilhas.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F6F8FB;
+  --ink:#14213D;
+  --ink-soft:#44506B;
+  --line:#D5DCE8;
+  --cell:#FFE45C;       /* amarelo de célula destacada */
+  --pos:#1E7F55;
+  --neg:#B5382B;
+  --white:#fff;
+  --display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
+  --body:"Source Sans 3",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:18px;line-height:1.55}
+.wrap{max-width:1040px;margin:0 auto;padding:0 20px}
+h1,h2,h3{font-family:var(--display);line-height:1.1;margin:0;letter-spacing:-.01em}
+h1{font-size:clamp(2.1rem,6vw,3.5rem);font-weight:800}
+h2{font-size:clamp(1.6rem,4vw,2.3rem);font-weight:700;margin-bottom:.6em}
+h3{font-size:1.15rem;font-weight:700}
+p{margin:0 0 1em;max-width:62ch}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+
+.btn{display:inline-block;background:var(--ink);color:var(--white);font-family:var(--display);font-weight:700;font-size:1.1rem;text-decoration:none;padding:16px 28px;border-radius:6px;border:2px solid var(--ink)}
+.btn:hover{background:#0c1630}
+.btn.on-dark{background:var(--cell);color:var(--ink);border-color:var(--cell)}
+.btn.on-dark:hover{background:#ffd800}
+.note{font-size:.95rem;color:var(--ink-soft);margin-top:14px}
+
+/* Hero */
+.hero{padding:44px 0 56px}
+.hero .wrap{display:grid;gap:36px;grid-template-columns:1fr;align-items:center}
+@media(min-width:900px){.hero .wrap{grid-template-columns:1.05fr .95fr;gap:56px}}
+.hero p.lead{font-size:1.2rem;margin:20px 0 26px}
+.price-tag{display:inline-block;background:var(--cell);padding:0 6px}
+
+/* Painel de exemplo */
+.sheet{background:var(--white);border:1px solid var(--line);border-radius:8px;overflow:hidden;
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+  background-size:100% 34px,25% 100%;background-color:var(--white)}
+.sheet-bar{display:flex;gap:6px;background:var(--ink);padding:8px 10px}
+.tab{font-family:var(--display);font-size:.8rem;font-weight:500;color:#C9D2E6;padding:4px 10px;border-radius:4px 4px 0 0}
+.tab.on{background:var(--white);color:var(--ink);font-weight:700}
+.sheet-body{padding:18px;background:rgba(255,255,255,.88)}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+.kpi{border:1px solid var(--line);background:var(--white);padding:8px 10px;border-radius:4px}
+.kpi small{display:block;font-size:.78rem;color:var(--ink-soft);line-height:1.2}
+.kpi b{font-family:var(--display);font-size:1.02rem;display:block;margin-top:2px}
+.kpi.res b{background:var(--cell);display:inline-block;padding:0 4px}
+.bars{display:flex;align-items:flex-end;gap:18px;height:140px;border-bottom:2px solid var(--ink);padding:0 8px;margin-bottom:6px}
+.grp{flex:1;display:flex;align-items:flex-end;justify-content:center;gap:6px;height:100%}
+.bar{width:26px;transform-origin:bottom;animation:grow .9s ease-out both}
+.bar.in{background:var(--pos)}
+.bar.out{background:var(--neg)}
+@keyframes grow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+.months{display:flex;gap:18px;padding:0 8px;font-size:.82rem;color:var(--ink-soft)}
+.months span{flex:1;text-align:center}
+.legend{font-size:.82rem;color:var(--ink-soft);margin:10px 0 14px}
+.legend i{display:inline-block;width:10px;height:10px;margin:0 4px 0 10px;vertical-align:baseline}
+.limit{background:var(--white);border:1px solid var(--line);padding:10px 12px;border-radius:4px}
+.limit .row{display:flex;justify-content:space-between;font-size:.88rem;margin-bottom:6px}
+.meter{height:10px;background:var(--line);border-radius:5px;overflow:hidden}
+.meter i{display:block;height:100%;width:3%;background:var(--pos)}
+.fake{font-size:.85rem;color:var(--ink-soft);margin:10px 0 0}
+
+/* Seções */
+section{padding:56px 0}
+.alt{background:var(--white);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.problem p{font-size:1.2rem}
+
+.tabs-list{display:grid;gap:0;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--paper)}
+.tabs-list div{display:grid;grid-template-columns:1fr;gap:6px;padding:18px 20px;border-top:1px solid var(--line)}
+.tabs-list div:first-child{border-top:0}
+@media(min-width:760px){.tabs-list div{grid-template-columns:200px 1fr;gap:24px;align-items:baseline}}
+.tabs-list dt{font-family:var(--display);font-weight:700}
+.tabs-list dd{margin:0;color:var(--ink-soft)}
+dl.tabs-list{margin:0}
+
+.points{list-style:none;margin:28px 0 0;padding:0;display:grid;gap:12px}
+.points li{padding-left:28px;position:relative}
+.points li::before{content:"";position:absolute;left:0;top:.55em;width:14px;height:14px;background:var(--cell);border:1px solid var(--ink)}
+
+ol.steps{margin:0;padding:0;list-style:none;display:grid;gap:18px;counter-reset:s}
+ol.steps li{counter-increment:s;padding-left:54px;position:relative;max-width:62ch}
+ol.steps li::before{content:counter(s);position:absolute;left:0;top:-2px;width:38px;height:38px;border:2px solid var(--ink);font-family:var(--display);font-weight:800;display:grid;place-items:center;background:var(--cell)}
+
+details{border-top:1px solid var(--line);padding:16px 0}
+details:last-of-type{border-bottom:1px solid var(--line)}
+summary{cursor:pointer;font-family:var(--display);font-weight:700;font-size:1.1rem}
+details p{margin:10px 0 0;color:var(--ink-soft)}
+
+.final{background:var(--ink);color:var(--white);text-align:center}
+.final p{margin-left:auto;margin-right:auto;color:#C9D2E6}
+.final .big{font-family:var(--display);font-size:clamp(2.4rem,8vw,3.6rem);font-weight:800;color:var(--ink);background:var(--cell);display:inline-block;padding:0 14px;margin:6px 0 18px}
+footer{padding:28px 0 40px;font-size:.92rem;color:var(--ink-soft)}
+footer p{max-width:80ch}
+
+@media(prefers-reduced-motion:reduce){.bar{animation:none}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div>
+      <h1>Saiba quanto sobra no seu MEI no fim do mês</h1>
+      <p class="lead">Planilha pronta de controle financeiro: você lança o dia a dia e o painel faz as contas. Funciona no Excel e no Google Planilhas.</p>
+      <!-- TROQUE O LINK ABAIXO PELO LINK DE COMPRA DA KIWIFY -->
+      <a class="btn" href="COLE_AQUI_O_LINK_DE_COMPRA_DA_KIWIFY">Quero a planilha por R$&nbsp;29,90</a>
+      <p class="note">Pague com Pix, cartão ou boleto. A entrega é digital, depois da confirmação do pagamento.</p>
+    </div>
+
+    <div aria-label="Exemplo do painel da planilha, com dados fictícios">
+      <div class="sheet" role="img" aria-label="Painel com faturamento de R$ 2.450, saídas de R$ 265 e resultado de R$ 2.185 em três meses de exemplo">
+        <div class="sheet-bar"><span class="tab">Instruções</span><span class="tab">Lançamentos</span><span class="tab on">Painel</span><span class="tab">Config</span></div>
+        <div class="sheet-body">
+          <div class="kpis">
+            <div class="kpi"><small>Faturamento</small><b>R$ 2.450,00</b></div>
+            <div class="kpi"><small>Saídas</small><b>R$ 265,00</b></div>
+            <div class="kpi res"><small>Resultado</small><b>R$ 2.185,00</b></div>
+          </div>
+          <div class="bars" aria-hidden="true">
+            <div class="grp"><div class="bar in" style="height:37.5%"></div><div class="bar out" style="height:15%"></div></div>
+            <div class="grp"><div class="bar in" style="height:66.7%;animation-delay:.15s"></div><div class="bar out" style="height:7%;animation-delay:.15s"></div></div>
+            <div class="grp"><div class="bar in" style="height:100%;animation-delay:.3s"></div><div class="bar out" style="height:0"></div></div>
+          </div>
+          <div class="months" aria-hidden="true"><span>Jan</span><span>Fev</span><span>Mar</span></div>
+          <p class="legend"><i style="background:var(--pos)"></i>Faturamento<i style="background:var(--neg)"></i>Saídas</p>
+          <div class="limit">
+            <div class="row"><span>Limite anual do MEI usado</span><b>3,0%</b></div>
+            <div class="meter"><i></i></div>
+            <div class="row" style="margin:6px 0 0"><span>Situação: dentro do limite</span></div>
+          </div>
+        </div>
+      </div>
+      <p class="fake">Exemplo com dados fictícios.</p>
+    </div>
+  </div>
+</header>
+
+<section class="problem">
+  <div class="wrap">
+    <h2>Misturar o dinheiro da empresa com o seu tira o controle</h2>
+    <p>Quando as vendas caem no Pix pessoal e as contas saem do mesmo lugar, fica difícil saber se o negócio dá lucro e se o faturamento do ano está perto do limite do MEI.</p>
+    <p>Esta planilha separa as coisas: o que é do negócio fica de um lado, o que você retira para si fica do outro, e o painel mostra o resultado de cada mês.</p>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="wrap">
+    <h2>O que vem na planilha</h2>
+    <dl class="tabs-list">
+      <div><dt>Instruções</dt><dd>Passo a passo de uso e a legenda de cores: o que você preenche e o que é automático.</dd></div>
+      <div><dt>Lançamentos</dt><dd>Você registra data, categoria, descrição, forma de pagamento e valor. A categoria vem de uma lista pronta e o sistema sabe sozinho se é entrada ou saída.</dd></div>
+      <div><dt>Painel</dt><dd>Faturamento, saídas, resultado, retiradas e saldo mês a mês, gráfico, totais por categoria e quanto do limite anual do MEI já foi usado, com aviso quando estiver perto.</dd></div>
+      <div><dt>Config</dt><dd>Ano de controle, limite de faturamento e categorias, tudo ajustável ao seu negócio.</dd></div>
+    </dl>
+    <ul class="points">
+      <li>Até 20 categorias, que você pode renomear ou criar.</li>
+      <li>Retiradas pessoais e aportes ficam à parte, sem bagunçar o resultado do negócio.</li>
+      <li>Fórmulas prontas: você só preenche as células em azul.</li>
+      <li>Capacidade para até 1.000 lançamentos por arquivo.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Como usar</h2>
+    <ol class="steps">
+      <li>Abra a aba Config e confira o ano e o limite de faturamento.</li>
+      <li>Na aba Lançamentos, registre cada entrada e saída escolhendo a categoria na lista.</li>
+      <li>Abra o Painel: o resultado do mês e o uso do limite já estão calculados.</li>
+    </ol>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="wrap">
+    <h2>Perguntas frequentes</h2>
+    <details><summary>Preciso saber Excel?</summary><p>Não. Você só preenche as células em azul, e as fórmulas já estão prontas.</p></details>
+    <details><summary>Funciona no celular?</summary><p>Abre no aplicativo do Excel ou do Google Planilhas. Para lançar muitos registros de uma vez, o computador é mais confortável.</p></details>
+    <details><summary>Posso mudar as categorias?</summary><p>Sim, na aba Config. Há espaço para até 20 categorias.</p></details>
+    <details><summary>Quantos lançamentos cabem?</summary><p>Até 1.000 por arquivo. Para um novo ano, salve uma cópia da planilha e altere o ano na aba Config.</p></details>
+    <details><summary>A planilha substitui um contador?</summary><p>Não. Ela organiza o seu financeiro, mas as regras e o limite do MEI podem mudar. Confira sempre no Portal do Empreendedor e, em caso de dúvida, fale com um contador.</p></details>
+  </div>
+</section>
+
+<section class="final">
+  <div class="wrap">
+    <h2>Comece a controlar o seu MEI hoje</h2>
+    <p>Pagamento por Pix, cartão ou boleto, processado pela Kiwify. Entrega digital após a confirmação.</p>
+    <div class="big">R$&nbsp;29,90</div><br>
+    <!-- TROQUE O LINK ABAIXO PELO LINK DE COMPRA DA KIWIFY -->
+    <a class="btn on-dark" href="COLE_AQUI_O_LINK_DE_COMPRA_DA_KIWIFY">Comprar a planilha</a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>Dúvidas? Escreva para <!-- TROQUE PELO SEU E-MAIL OU WHATSAPP -->SEU_CONTATO_AQUI.</p>
+    <p>Esta planilha é uma ferramenta de organização financeira e não substitui a orientação de um contador. Os exemplos mostrados são fictícios e não representam resultados garantidos.</p>
+  </div>
+</footer>
+
+</body>
+</html>
