@@ -38,13 +38,13 @@
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
     --paper:#0F1626; --ink:#E8EDF7; --ink-soft:#A9B4CA; --line:#2A3550; --white:#18223A;
-    --pos:#3FBF86; --neg:#E0705F; --sheet-body:rgba(24,34,58,.9); --btn-hover:#C9D4EA; --navy:#0A1120; --edit:#1C2E52;
+    --pos:#3FBF86; --neg:#E0705F; --sheet-body:rgba(24,34,58,.9); --btn-hover:#C9D4EA; --navy:#0A1120; --edit:#244780;
     color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
   --paper:#0F1626; --ink:#E8EDF7; --ink-soft:#A9B4CA; --line:#2A3550; --white:#18223A;
-    --pos:#3FBF86; --neg:#E0705F; --sheet-body:rgba(24,34,58,.9); --btn-hover:#C9D4EA; --navy:#0A1120; --edit:#1C2E52;
+    --pos:#3FBF86; --neg:#E0705F; --sheet-body:rgba(24,34,58,.9); --btn-hover:#C9D4EA; --navy:#0A1120; --edit:#244780;
     color-scheme:dark;
 }
 *{box-sizing:border-box}
@@ -90,16 +90,15 @@ a{color:inherit}
 .dica b{color:var(--ink)}
 /* Lançamentos */
 .lanc{width:100%;border-collapse:collapse;table-layout:fixed;font-size:.88rem;background:var(--white)}
-.lanc .c-mes{width:66px}.lanc .c-valor{width:92px}.lanc .c-x{width:30px}
+.lanc .c-mes{width:66px}.lanc .c-valor{width:92px}
+.lanc td.fixo{padding:0 6px;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lanc td.fixo.v{text-align:right}
 .lanc th{font-family:var(--display);font-size:.75rem;font-weight:700;text-align:left;color:var(--ink-soft);padding:4px 6px;border:1px solid var(--line);background:var(--paper)}
 .lanc td{border:1px solid var(--line);padding:0;height:34px}
 .lanc td.tipo{padding:0 6px;font-size:.78rem;color:var(--ink-soft);white-space:nowrap}
 .lanc select,.lanc input{width:100%;height:33px;border:0;padding:0 4px 0 6px;text-overflow:ellipsis;font:inherit;font-size:.88rem;color:var(--ink);background:var(--edit)}
 .lanc input{text-align:right}
 .lanc select:focus,.lanc input:focus{outline:2px solid var(--pos);outline-offset:-2px}
-.lanc .x{width:30px;text-align:center}
-.lanc .x button{width:100%;height:33px;border:0;background:none;color:var(--ink-soft);font-size:1.1rem;cursor:pointer}
-.lanc .x button:hover{color:var(--neg)}
 .lanc-acoes{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap}
 .mini-btn{font:inherit;font-size:.85rem;font-weight:600;padding:6px 12px;border-radius:4px;cursor:pointer;border:1px solid var(--line);background:var(--white);color:var(--ink)}
 .mini-btn:hover{border-color:var(--ink-soft)}
@@ -226,15 +225,15 @@ footer p{max-width:80ch}
 
         <div class="sheet-body" role="tabpanel" data-painel="lancamentos" hidden>
           <table class="lanc">
-            <colgroup><col class="c-mes"><col><col class="c-valor"><col class="c-x"></colgroup>
-            <thead><tr><th>Mês</th><th>Categoria</th><th>Valor (R$)</th><th class="x" aria-label="Excluir"></th></tr></thead>
+            <colgroup><col class="c-mes"><col><col class="c-valor"></colgroup>
+            <thead><tr><th>Mês</th><th>Categoria</th><th>Valor (R$)</th></tr></thead>
             <tbody id="d-linhas"></tbody>
           </table>
           <div class="lanc-acoes">
-            <button type="button" class="mini-btn" id="d-novo">+ Lançamento</button>
+            <span class="dica" style="margin:0 !important">As 3 linhas em azul são suas: mude mês, categoria ou valor.</span>
             <button type="button" class="mini-btn" id="d-painel">Ver o painel →</button>
           </div>
-          <p class="dica">As células em azul são as que você preenche. O resto é automático.</p>
+          <p class="dica">Na planilha de verdade, você preenche as células em azul e o resto é automático.</p>
         </div>
 
         <div class="sheet-body" role="tabpanel" data-painel="config" hidden>
@@ -331,7 +330,7 @@ footer p{max-width:80ch}
       ["Retirada", "retirada"]
     ];
     var TIPO = { entrada: "Entrada", saida: "Saída", retirada: "Retirada" };
-    var MAX = 12;
+    var EDITAVEIS = 3; // só as últimas linhas podem ser mudadas; as outras ficam fixas
     var linhas = [
       [0, 0, 400], [0, 2, 75], [0, 3, 75], [0, 1, 150],
       [1, 0, 800], [1, 4, 40], [1, 2, 75], [1, 5, 300],
@@ -350,15 +349,17 @@ footer p{max-width:80ch}
     var fmtValor = function (v) { return v ? v.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : ""; };
 
     function desenharLinhas() {
+      var primeira = linhas.length - EDITAVEIS;
       $("d-linhas").innerHTML = linhas.map(function (l, i) {
+        if (i < primeira) {
+          return '<tr><td class="fixo">' + MESES[l[0]] + '</td><td class="fixo">' + CATS[l[1]][0] + '</td><td class="fixo v">' + fmtValor(l[2]) + '</td></tr>';
+        }
         return '<tr><td><select data-i="' + i + '" data-c="0" aria-label="Mês">' +
           MESES.map(function (m, k) { return '<option value="' + k + '"' + (k === l[0] ? " selected" : "") + ">" + m + "</option>"; }).join("") +
           '</select></td><td><select data-i="' + i + '" data-c="1" aria-label="Categoria">' +
           CATS.map(function (c, k) { return '<option value="' + k + '"' + (k === l[1] ? " selected" : "") + ">" + c[0] + "</option>"; }).join("") +
-          '</select></td><td><input data-i="' + i + '" data-c="2" inputmode="decimal" aria-label="Valor" value="' + fmtValor(l[2]) + '"></td>' +
-          '<td class="x"><button type="button" data-del="' + i + '" aria-label="Excluir lançamento" title="Excluir">×</button></td></tr>';
+          '</select></td><td><input data-i="' + i + '" data-c="2" inputmode="decimal" aria-label="Valor" value="' + fmtValor(l[2]) + '"></td></tr>';
       }).join("");
-      $("d-novo").disabled = linhas.length >= MAX;
     }
 
     function calcular() {
@@ -396,8 +397,6 @@ footer p{max-width:80ch}
     demo.addEventListener("click", function (e) {
       var t = e.target.closest(".tab");
       if (t) return abrir(t.dataset.aba);
-      var del = e.target.closest("[data-del]");
-      if (del) { linhas.splice(+del.dataset.del, 1); desenharLinhas(); calcular(); }
     });
     demo.addEventListener("change", function (e) {
       var el = e.target;
@@ -409,13 +408,6 @@ footer p{max-width:80ch}
       var el = e.target;
       if (el.dataset.c === "2") { linhas[+el.dataset.i][2] = num(el.value); calcular(); }
       else if (el.id === "d-limite") { limite = num(el.value); calcular(); }
-    });
-    $("d-novo").addEventListener("click", function () {
-      if (linhas.length >= MAX) return;
-      linhas.push([2, 0, 0]);
-      desenharLinhas();
-      var ins = $("d-linhas").querySelectorAll("input");
-      ins[ins.length - 1].focus();
     });
     $("d-painel").addEventListener("click", function () { abrir("painel"); });
     // Setas trocam de aba (padrão de abas acessíveis)
