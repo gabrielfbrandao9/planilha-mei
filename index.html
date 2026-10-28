@@ -8,6 +8,10 @@
 <link rel="icon" href="icons/icon-192.png" type="image/png" sizes="192x192">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <meta name="theme-color" content="#14213D">
+<script>
+  // Aplica o tema escolhido antes de desenhar a página (evita piscar).
+  try { var t = localStorage.getItem("mei:tema"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch (e) {}
+</script>
 <meta name="description" content="Planilha pronta para o MEI lançar entradas e saídas, separar o dinheiro da empresa do pessoal e acompanhar o limite anual de faturamento. Excel e Google Planilhas.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,8 +26,25 @@
   --pos:#1E7F55;
   --neg:#B5382B;
   --white:#fff;
+  --navy:#14213D;       /* fundo sempre escuro (barra da planilha e bloco final) */
+  --on-cell:#14213D;    /* texto sobre o amarelo */
+  --sheet-body:rgba(255,255,255,.88);
+  --btn-hover:#0c1630;
+  color-scheme:light;
   --display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
   --body:"Source Sans 3",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#0F1626; --ink:#E8EDF7; --ink-soft:#A9B4CA; --line:#2A3550; --white:#18223A;
+    --pos:#3FBF86; --neg:#E0705F; --sheet-body:rgba(24,34,58,.9); --btn-hover:#C9D4EA; --navy:#0A1120;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0F1626; --ink:#E8EDF7; --ink-soft:#A9B4CA; --line:#2A3550; --white:#18223A;
+    --pos:#3FBF86; --neg:#E0705F; --sheet-body:rgba(24,34,58,.9); --btn-hover:#C9D4EA; --navy:#0A1120;
+    color-scheme:dark;
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -38,31 +59,32 @@ a{color:inherit}
 :focus-visible{outline:3px solid var(--ink);outline-offset:3px}
 
 .btn{display:inline-block;background:var(--ink);color:var(--white);font-family:var(--display);font-weight:700;font-size:1.1rem;text-decoration:none;padding:16px 28px;border-radius:6px;border:2px solid var(--ink)}
-.btn:hover{background:#0c1630}
-.btn.on-dark{background:var(--cell);color:var(--ink);border-color:var(--cell)}
+.btn:hover{background:var(--btn-hover);border-color:var(--btn-hover)}
+.btn.on-dark{background:var(--cell);color:var(--on-cell);border-color:var(--cell)}
 .btn.on-dark:hover{background:#ffd800}
 .note{font-size:.95rem;color:var(--ink-soft);margin-top:14px}
 
 /* Hero */
 .hero{padding:44px 0 56px}
+@media(max-width:899px){.hero{padding-top:70px}}
 .hero .wrap{display:grid;gap:36px;grid-template-columns:1fr;align-items:center}
 @media(min-width:900px){.hero .wrap{grid-template-columns:1.05fr .95fr;gap:56px}}
 .hero p.lead{font-size:1.2rem;margin:20px 0 26px}
-.price-tag{display:inline-block;background:var(--cell);padding:0 6px}
+.price-tag{display:inline-block;background:var(--cell);color:var(--on-cell);padding:0 6px}
 
 /* Painel de exemplo */
 .sheet{background:var(--white);border:1px solid var(--line);border-radius:8px;overflow:hidden;
   background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
   background-size:100% 34px,25% 100%;background-color:var(--white)}
-.sheet-bar{display:flex;gap:6px;background:var(--ink);padding:8px 10px}
+.sheet-bar{display:flex;gap:6px;background:var(--navy);padding:8px 10px}
 .tab{font-family:var(--display);font-size:.8rem;font-weight:500;color:#C9D2E6;padding:4px 10px;border-radius:4px 4px 0 0}
 .tab.on{background:var(--white);color:var(--ink);font-weight:700}
-.sheet-body{padding:18px;background:rgba(255,255,255,.88)}
+.sheet-body{padding:18px;background:var(--sheet-body)}
 .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
 .kpi{border:1px solid var(--line);background:var(--white);padding:8px 10px;border-radius:4px}
 .kpi small{display:block;font-size:.78rem;color:var(--ink-soft);line-height:1.2}
 .kpi b{font-family:var(--display);font-size:1.02rem;display:block;margin-top:2px}
-.kpi.res b{background:var(--cell);display:inline-block;padding:0 4px}
+.kpi.res b{background:var(--cell);color:var(--on-cell);display:inline-block;padding:0 4px}
 .bars{display:flex;align-items:flex-end;gap:18px;height:140px;border-bottom:2px solid var(--ink);padding:0 8px;margin-bottom:6px}
 .grp{flex:1;display:flex;align-items:flex-end;justify-content:center;gap:6px;height:100%}
 .bar{width:26px;transform-origin:bottom;animation:grow .9s ease-out both}
@@ -94,27 +116,40 @@ dl.tabs-list{margin:0}
 
 .points{list-style:none;margin:28px 0 0;padding:0;display:grid;gap:12px}
 .points li{padding-left:28px;position:relative}
-.points li::before{content:"";position:absolute;left:0;top:.55em;width:14px;height:14px;background:var(--cell);border:1px solid var(--ink)}
+.points li::before{content:"";position:absolute;left:0;top:.55em;width:14px;height:14px;background:var(--cell);border:1px solid var(--on-cell)}
 
 ol.steps{margin:0;padding:0;list-style:none;display:grid;gap:18px;counter-reset:s}
 ol.steps li{counter-increment:s;padding-left:54px;position:relative;max-width:62ch}
-ol.steps li::before{content:counter(s);position:absolute;left:0;top:-2px;width:38px;height:38px;border:2px solid var(--ink);font-family:var(--display);font-weight:800;display:grid;place-items:center;background:var(--cell)}
+ol.steps li::before{content:counter(s);position:absolute;left:0;top:-2px;width:38px;height:38px;border:2px solid var(--ink);font-family:var(--display);font-weight:800;display:grid;place-items:center;background:var(--cell);color:var(--on-cell)}
 
 details{border-top:1px solid var(--line);padding:16px 0}
 details:last-of-type{border-bottom:1px solid var(--line)}
 summary{cursor:pointer;font-family:var(--display);font-weight:700;font-size:1.1rem}
 details p{margin:10px 0 0;color:var(--ink-soft)}
 
-.final{background:var(--ink);color:var(--white);text-align:center}
+.final{background:var(--navy);color:#fff;text-align:center}
 .final p{margin-left:auto;margin-right:auto;color:#C9D2E6}
-.final .big{font-family:var(--display);font-size:clamp(2.4rem,8vw,3.6rem);font-weight:800;color:var(--ink);background:var(--cell);display:inline-block;padding:0 14px;margin:6px 0 18px}
+.final .big{font-family:var(--display);font-size:clamp(2.4rem,8vw,3.6rem);font-weight:800;color:var(--on-cell);background:var(--cell);display:inline-block;padding:0 14px;margin:6px 0 18px}
 footer{padding:28px 0 40px;font-size:.92rem;color:var(--ink-soft)}
 footer p{max-width:80ch}
+
+/* Botão claro/escuro */
+.tema{position:fixed;top:14px;right:14px;z-index:5;width:44px;height:44px;display:grid;place-items:center;cursor:pointer;
+  border-radius:999px;border:1px solid var(--line);background:var(--white);color:var(--ink-soft);box-shadow:0 2px 10px rgba(20,33,61,.12)}
+.tema:hover{color:var(--ink)}
+.tema svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tema .ic-sol circle{fill:currentColor;stroke:none}
+.tema .ic-sol,.escuro .tema .ic-lua{display:none}
+.escuro .tema .ic-sol{display:block}
 
 @media(prefers-reduced-motion:reduce){.bar{animation:none}html{scroll-behavior:auto}}
 </style>
 </head>
 <body>
+<button type="button" class="tema" id="tema" aria-label="Mudar para o modo escuro" title="Mudar para o modo escuro">
+  <svg class="ic-lua" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg>
+  <svg class="ic-sol" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg>
+</button>
 
 <header class="hero">
   <div class="wrap">
@@ -219,5 +254,29 @@ footer p{max-width:80ch}
   </div>
 </footer>
 
+<script>
+  // Modo claro/escuro: o padrão segue o aparelho; o botão escolhe e fica guardado.
+  (function () {
+    var root = document.documentElement, btn = document.getElementById("tema");
+    var sistema = matchMedia("(prefers-color-scheme: dark)");
+    function atual() { return root.dataset.theme || (sistema.matches ? "dark" : "light"); }
+    function mostrar() {
+      var escuro = atual() === "dark";
+      root.classList.toggle("escuro", escuro);
+      var txt = escuro ? "Mudar para o modo claro" : "Mudar para o modo escuro";
+      btn.setAttribute("aria-label", txt);
+      btn.title = txt;
+      document.querySelector('meta[name="theme-color"]').content = escuro ? "#0F1626" : "#14213D";
+    }
+    btn.addEventListener("click", function () {
+      var novo = atual() === "dark" ? "light" : "dark";
+      root.dataset.theme = novo;
+      try { localStorage.setItem("mei:tema", novo); } catch (e) {}
+      mostrar();
+    });
+    sistema.addEventListener("change", mostrar);
+    mostrar();
+  })();
+</script>
 </body>
 </html>
