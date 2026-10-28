@@ -30,6 +30,7 @@
   --on-cell:#14213D;    /* texto sobre o amarelo */
   --sheet-body:rgba(255,255,255,.88);
   --btn-hover:#0c1630;
+  --edit:#E7F0FF;       /* células que a pessoa preenche (azul, como na planilha) */
   color-scheme:light;
   --display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
   --body:"Source Sans 3",system-ui,-apple-system,"Segoe UI",sans-serif;
@@ -37,13 +38,13 @@
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
     --paper:#0F1626; --ink:#E8EDF7; --ink-soft:#A9B4CA; --line:#2A3550; --white:#18223A;
-    --pos:#3FBF86; --neg:#E0705F; --sheet-body:rgba(24,34,58,.9); --btn-hover:#C9D4EA; --navy:#0A1120;
+    --pos:#3FBF86; --neg:#E0705F; --sheet-body:rgba(24,34,58,.9); --btn-hover:#C9D4EA; --navy:#0A1120; --edit:#1C2E52;
     color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
   --paper:#0F1626; --ink:#E8EDF7; --ink-soft:#A9B4CA; --line:#2A3550; --white:#18223A;
-    --pos:#3FBF86; --neg:#E0705F; --sheet-body:rgba(24,34,58,.9); --btn-hover:#C9D4EA; --navy:#0A1120;
+    --pos:#3FBF86; --neg:#E0705F; --sheet-body:rgba(24,34,58,.9); --btn-hover:#C9D4EA; --navy:#0A1120; --edit:#1C2E52;
     color-scheme:dark;
 }
 *{box-sizing:border-box}
@@ -76,10 +77,42 @@ a{color:inherit}
 .sheet{background:var(--white);border:1px solid var(--line);border-radius:8px;overflow:hidden;
   background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
   background-size:100% 34px,25% 100%;background-color:var(--white)}
-.sheet-bar{display:flex;gap:6px;background:var(--navy);padding:8px 10px}
-.tab{font-family:var(--display);font-size:.8rem;font-weight:500;color:#C9D2E6;padding:4px 10px;border-radius:4px 4px 0 0}
-.tab.on{background:var(--white);color:var(--ink);font-weight:700}
-.sheet-body{padding:18px;background:var(--sheet-body)}
+.sheet-bar{display:flex;gap:4px;background:var(--navy);padding:8px 8px 0;overflow-x:auto}
+.tab{font-family:var(--display);font-size:.8rem;font-weight:500;color:#C9D2E6;padding:6px 10px;border-radius:4px 4px 0 0;
+  background:none;border:0;cursor:pointer;white-space:nowrap}
+.tab:hover{color:#fff}
+.tab[aria-selected="true"]{background:var(--white);color:var(--ink);font-weight:700}
+.tab:focus-visible{outline:2px solid var(--cell);outline-offset:-2px}
+.sheet-body{padding:18px;background:var(--sheet-body);min-height:330px}
+.sheet-body h3{font-size:1rem;margin:0 0 8px}
+.sheet-body p{font-size:.92rem;margin:0 0 .7em}
+.dica{font-size:.85rem;color:var(--ink-soft);margin:12px 0 0 !important}
+.dica b{color:var(--ink)}
+/* Lançamentos */
+.lanc{width:100%;border-collapse:collapse;table-layout:fixed;font-size:.88rem;background:var(--white)}
+.lanc .c-mes{width:66px}.lanc .c-valor{width:92px}.lanc .c-x{width:30px}
+.lanc th{font-family:var(--display);font-size:.75rem;font-weight:700;text-align:left;color:var(--ink-soft);padding:4px 6px;border:1px solid var(--line);background:var(--paper)}
+.lanc td{border:1px solid var(--line);padding:0;height:34px}
+.lanc td.tipo{padding:0 6px;font-size:.78rem;color:var(--ink-soft);white-space:nowrap}
+.lanc select,.lanc input{width:100%;height:33px;border:0;padding:0 4px 0 6px;text-overflow:ellipsis;font:inherit;font-size:.88rem;color:var(--ink);background:var(--edit)}
+.lanc input{text-align:right}
+.lanc select:focus,.lanc input:focus{outline:2px solid var(--pos);outline-offset:-2px}
+.lanc .x{width:30px;text-align:center}
+.lanc .x button{width:100%;height:33px;border:0;background:none;color:var(--ink-soft);font-size:1.1rem;cursor:pointer}
+.lanc .x button:hover{color:var(--neg)}
+.lanc-acoes{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap}
+.mini-btn{font:inherit;font-size:.85rem;font-weight:600;padding:6px 12px;border-radius:4px;cursor:pointer;border:1px solid var(--line);background:var(--white);color:var(--ink)}
+.mini-btn:hover{border-color:var(--ink-soft)}
+.mini-btn:disabled{opacity:.5;cursor:default}
+.campo{display:flex;align-items:center;gap:10px;font-size:.9rem;margin:6px 0}
+.campo input{width:130px;height:34px;border:1px solid var(--line);padding:0 8px;font:inherit;font-size:.9rem;text-align:right;color:var(--ink);background:var(--edit)}
+.campo input:focus{outline:2px solid var(--pos);outline-offset:-2px}
+@media(max-width:480px){
+  .sheet-body{padding:12px}
+  .tab{padding:6px 8px;font-size:.76rem}
+  .lanc .c-valor{width:80px}
+  .kpis{gap:6px}.kpi{padding:6px 7px}.kpi b{font-size:.92rem}
+}
 .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
 .kpi{border:1px solid var(--line);background:var(--white);padding:8px 10px;border-radius:4px}
 .kpi small{display:block;font-size:.78rem;color:var(--ink-soft);line-height:1.2}
@@ -87,7 +120,7 @@ a{color:inherit}
 .kpi.res b{background:var(--cell);color:var(--on-cell);display:inline-block;padding:0 4px}
 .bars{display:flex;align-items:flex-end;gap:18px;height:140px;border-bottom:2px solid var(--ink);padding:0 8px;margin-bottom:6px}
 .grp{flex:1;display:flex;align-items:flex-end;justify-content:center;gap:6px;height:100%}
-.bar{width:26px;transform-origin:bottom;animation:grow .9s ease-out both}
+.bar{width:26px;transform-origin:bottom;animation:grow .9s ease-out both;transition:height .35s ease;min-height:0}
 .bar.in{background:var(--pos)}
 .bar.out{background:var(--neg)}
 @keyframes grow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
@@ -98,7 +131,11 @@ a{color:inherit}
 .limit{background:var(--white);border:1px solid var(--line);padding:10px 12px;border-radius:4px}
 .limit .row{display:flex;justify-content:space-between;font-size:.88rem;margin-bottom:6px}
 .meter{height:10px;background:var(--line);border-radius:5px;overflow:hidden}
-.meter i{display:block;height:100%;width:3%;background:var(--pos)}
+.meter i{display:block;height:100%;width:3%;background:var(--pos);transition:width .35s ease,background-color .35s}
+.meter i.perto{background:#D9A400}
+.meter i.acima{background:var(--neg)}
+.kpi.ret{grid-column:1/-1;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.kpi.ret b{margin:0}
 .fake{font-size:.85rem;color:var(--ink-soft);margin:10px 0 0}
 
 /* Seções */
@@ -161,30 +198,60 @@ footer p{max-width:80ch}
       <p class="note">Pague com Pix, cartão ou boleto. A entrega é digital, depois da confirmação do pagamento.</p>
     </div>
 
-    <div aria-label="Exemplo do painel da planilha, com dados fictícios">
-      <div class="sheet" role="img" aria-label="Painel com faturamento de R$ 2.450, saídas de R$ 265 e resultado de R$ 2.185 em três meses de exemplo">
-        <div class="sheet-bar"><span class="tab">Instruções</span><span class="tab">Lançamentos</span><span class="tab on">Painel</span><span class="tab">Config</span></div>
-        <div class="sheet-body">
+    <div class="demo" id="demo">
+      <div class="sheet">
+        <div class="sheet-bar" role="tablist" aria-label="Abas da planilha de exemplo">
+          <button type="button" class="tab" role="tab" data-aba="instrucoes" aria-selected="false">Instruções</button>
+          <button type="button" class="tab" role="tab" data-aba="lancamentos" aria-selected="false">Lançamentos</button>
+          <button type="button" class="tab" role="tab" data-aba="painel" aria-selected="true">Painel</button>
+          <button type="button" class="tab" role="tab" data-aba="config" aria-selected="false">Config</button>
+        </div>
+
+        <div class="sheet-body" role="tabpanel" data-painel="painel">
           <div class="kpis">
-            <div class="kpi"><small>Faturamento</small><b>R$ 2.450,00</b></div>
-            <div class="kpi"><small>Saídas</small><b>R$ 265,00</b></div>
-            <div class="kpi res"><small>Resultado</small><b>R$ 2.185,00</b></div>
+            <div class="kpi"><small>Faturamento</small><b id="d-fat"></b></div>
+            <div class="kpi"><small>Saídas</small><b id="d-sai"></b></div>
+            <div class="kpi res"><small>Resultado</small><b id="d-res"></b></div>
           </div>
-          <div class="bars" aria-hidden="true">
-            <div class="grp"><div class="bar in" style="height:37.5%"></div><div class="bar out" style="height:15%"></div></div>
-            <div class="grp"><div class="bar in" style="height:66.7%;animation-delay:.15s"></div><div class="bar out" style="height:7%;animation-delay:.15s"></div></div>
-            <div class="grp"><div class="bar in" style="height:100%;animation-delay:.3s"></div><div class="bar out" style="height:0"></div></div>
-          </div>
+          <div class="bars" id="d-bars" aria-hidden="true"></div>
           <div class="months" aria-hidden="true"><span>Jan</span><span>Fev</span><span>Mar</span></div>
           <p class="legend"><i style="background:var(--pos)"></i>Faturamento<i style="background:var(--neg)"></i>Saídas</p>
           <div class="limit">
-            <div class="row"><span>Limite anual do MEI usado</span><b>3,0%</b></div>
-            <div class="meter"><i></i></div>
-            <div class="row" style="margin:6px 0 0"><span>Situação: dentro do limite</span></div>
+            <div class="row"><span>Limite anual do MEI usado</span><b id="d-pct"></b></div>
+            <div class="meter"><i id="d-meter"></i></div>
+            <div class="row" style="margin:6px 0 0"><span id="d-sit"></span></div>
           </div>
+          <p class="dica">Experimente: abra a aba <b>Lançamentos</b> e mude um valor.</p>
+        </div>
+
+        <div class="sheet-body" role="tabpanel" data-painel="lancamentos" hidden>
+          <table class="lanc">
+            <colgroup><col class="c-mes"><col><col class="c-valor"><col class="c-x"></colgroup>
+            <thead><tr><th>Mês</th><th>Categoria</th><th>Valor (R$)</th><th class="x" aria-label="Excluir"></th></tr></thead>
+            <tbody id="d-linhas"></tbody>
+          </table>
+          <div class="lanc-acoes">
+            <button type="button" class="mini-btn" id="d-novo">+ Lançamento</button>
+            <button type="button" class="mini-btn" id="d-painel">Ver o painel →</button>
+          </div>
+          <p class="dica">As células em azul são as que você preenche. O resto é automático.</p>
+        </div>
+
+        <div class="sheet-body" role="tabpanel" data-painel="config" hidden>
+          <h3>Config</h3>
+          <label class="campo">Limite anual do MEI (R$) <input id="d-limite" type="text" inputmode="numeric" value="81.000"></label>
+          <p class="dica">Diminua o limite para ver o aviso de “perto do limite” no painel.</p>
+        </div>
+
+        <div class="sheet-body" role="tabpanel" data-painel="instrucoes" hidden>
+          <h3>Como usar</h3>
+          <p>1. Em <b>Config</b>, confira o limite de faturamento.</p>
+          <p>2. Em <b>Lançamentos</b>, registre cada entrada e saída escolhendo a categoria.</p>
+          <p>3. O <b>Painel</b> mostra o resultado de cada mês e quanto do limite já foi usado.</p>
+          <p>Retiradas pessoais ficam à parte: não entram como saída do negócio.</p>
         </div>
       </div>
-      <p class="fake">Exemplo com dados fictícios.</p>
+      <p class="fake">Amostra interativa com dados fictícios: mexa à vontade, nada é salvo.</p>
     </div>
   </div>
 </header>
@@ -255,6 +322,116 @@ footer p{max-width:80ch}
 </footer>
 
 <script>
+  // Amostra interativa da planilha: lançamentos -> painel, recalculado a cada mudança.
+  (function () {
+    var MESES = ["Jan", "Fev", "Mar"];
+    var CATS = [
+      ["Vendas", "entrada"], ["Serviços", "entrada"],
+      ["DAS (imposto)", "saida"], ["Material", "saida"], ["Transporte", "saida"],
+      ["Retirada", "retirada"]
+    ];
+    var TIPO = { entrada: "Entrada", saida: "Saída", retirada: "Retirada" };
+    var MAX = 12;
+    var linhas = [
+      [0, 0, 400], [0, 2, 75], [0, 3, 75], [0, 1, 150],
+      [1, 0, 800], [1, 4, 40], [1, 2, 75], [1, 5, 300],
+      [2, 0, 900], [2, 1, 200]
+    ];
+    var limite = 81000;
+    var $ = function (id) { return document.getElementById(id); };
+    var real = function (v) { return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }); };
+    function num(t) {
+      t = String(t).replace(/[^\d,.-]/g, "");
+      if (t.indexOf(",") >= 0) t = t.replace(/\./g, "").replace(",", ".");
+      else if (/\.\d{3}$/.test(t)) t = t.replace(/\./g, "");
+      var v = parseFloat(t);
+      return isFinite(v) && v > 0 ? v : 0;
+    }
+    var fmtValor = function (v) { return v ? v.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : ""; };
+
+    function desenharLinhas() {
+      $("d-linhas").innerHTML = linhas.map(function (l, i) {
+        return '<tr><td><select data-i="' + i + '" data-c="0" aria-label="Mês">' +
+          MESES.map(function (m, k) { return '<option value="' + k + '"' + (k === l[0] ? " selected" : "") + ">" + m + "</option>"; }).join("") +
+          '</select></td><td><select data-i="' + i + '" data-c="1" aria-label="Categoria">' +
+          CATS.map(function (c, k) { return '<option value="' + k + '"' + (k === l[1] ? " selected" : "") + ">" + c[0] + "</option>"; }).join("") +
+          '</select></td><td><input data-i="' + i + '" data-c="2" inputmode="decimal" aria-label="Valor" value="' + fmtValor(l[2]) + '"></td>' +
+          '<td class="x"><button type="button" data-del="' + i + '" aria-label="Excluir lançamento" title="Excluir">×</button></td></tr>';
+      }).join("");
+      $("d-novo").disabled = linhas.length >= MAX;
+    }
+
+    function calcular() {
+      var ent = [0, 0, 0], sai = [0, 0, 0], ret = 0;
+      linhas.forEach(function (l) {
+        var t = CATS[l[1]][1];
+        if (t === "entrada") ent[l[0]] += l[2];
+        else if (t === "saida") sai[l[0]] += l[2];
+        else ret += l[2];
+      });
+      var fat = ent[0] + ent[1] + ent[2], s = sai[0] + sai[1] + sai[2];
+      $("d-fat").textContent = real(fat);
+      $("d-sai").textContent = real(s);
+      $("d-res").textContent = real(fat - s);
+      var max = Math.max.apply(null, ent.concat(sai)) || 1;
+      $("d-bars").innerHTML = MESES.map(function (m, k) {
+        return '<div class="grp"><div class="bar in" style="height:' + (ent[k] / max * 100) + '%"></div>' +
+          '<div class="bar out" style="height:' + (sai[k] / max * 100) + '%"></div></div>';
+      }).join("");
+      var pct = limite ? fat / limite * 100 : 0;
+      $("d-pct").textContent = pct.toLocaleString("pt-BR", { maximumFractionDigits: 1 }) + "%";
+      var m = $("d-meter");
+      m.style.width = Math.min(100, pct) + "%";
+      m.className = pct > 100 ? "acima" : pct >= 80 ? "perto" : "";
+      $("d-sit").textContent = "Situação: " + (pct > 100 ? "acima do limite!" : pct >= 80 ? "perto do limite" : "dentro do limite") +
+        (ret ? " · Retiradas: " + real(ret) : "");
+    }
+
+    function abrir(aba) {
+      document.querySelectorAll("#demo .tab").forEach(function (t) { t.setAttribute("aria-selected", t.dataset.aba === aba ? "true" : "false"); });
+      document.querySelectorAll("#demo [data-painel]").forEach(function (p) { p.hidden = p.dataset.painel !== aba; });
+    }
+
+    var demo = $("demo");
+    demo.addEventListener("click", function (e) {
+      var t = e.target.closest(".tab");
+      if (t) return abrir(t.dataset.aba);
+      var del = e.target.closest("[data-del]");
+      if (del) { linhas.splice(+del.dataset.del, 1); desenharLinhas(); calcular(); }
+    });
+    demo.addEventListener("change", function (e) {
+      var el = e.target;
+      if (el.dataset.c === "0" || el.dataset.c === "1") { linhas[+el.dataset.i][+el.dataset.c] = +el.value; calcular(); }
+      else if (el.dataset.c === "2") el.value = fmtValor(linhas[+el.dataset.i][2]);
+      else if (el.id === "d-limite") el.value = limite.toLocaleString("pt-BR");
+    });
+    demo.addEventListener("input", function (e) {
+      var el = e.target;
+      if (el.dataset.c === "2") { linhas[+el.dataset.i][2] = num(el.value); calcular(); }
+      else if (el.id === "d-limite") { limite = num(el.value); calcular(); }
+    });
+    $("d-novo").addEventListener("click", function () {
+      if (linhas.length >= MAX) return;
+      linhas.push([2, 0, 0]);
+      desenharLinhas();
+      var ins = $("d-linhas").querySelectorAll("input");
+      ins[ins.length - 1].focus();
+    });
+    $("d-painel").addEventListener("click", function () { abrir("painel"); });
+    // Setas trocam de aba (padrão de abas acessíveis)
+    demo.querySelector(".sheet-bar").addEventListener("keydown", function (e) {
+      if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+      var tabs = Array.prototype.slice.call(demo.querySelectorAll(".tab"));
+      var i = tabs.indexOf(document.activeElement);
+      if (i < 0) return;
+      var n = tabs[(i + (e.key === "ArrowRight" ? 1 : tabs.length - 1)) % tabs.length];
+      n.focus(); abrir(n.dataset.aba);
+    });
+
+    desenharLinhas();
+    calcular();
+  })();
+
   // Modo claro/escuro: o padrão segue o aparelho; o botão escolhe e fica guardado.
   (function () {
     var root = document.documentElement, btn = document.getElementById("tema");
