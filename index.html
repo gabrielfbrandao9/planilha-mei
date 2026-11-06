@@ -178,10 +178,16 @@ footer p{max-width:80ch}
 .tema .ic-sol,.escuro .tema .ic-lua{display:none}
 .escuro .tema .ic-sol{display:block}
 
+/* Botão do app */
+.instalar{position:fixed;top:14px;right:66px;z-index:5;height:44px;padding:0 16px;cursor:pointer;font:inherit;font-size:14px;font-weight:700;
+  border-radius:999px;border:1px solid var(--line);background:var(--white);color:var(--ink);box-shadow:0 2px 10px rgba(20,33,61,.12)}
+.instalar[hidden]{display:none}
+
 @media(prefers-reduced-motion:reduce){.bar{animation:none}html{scroll-behavior:auto}}
 </style>
 </head>
 <body>
+<button type="button" class="instalar" data-app-apk hidden>Instalar app</button>
 <button type="button" class="tema" id="tema" aria-label="Mudar para o modo escuro" title="Mudar para o modo escuro">
   <svg class="ic-lua" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg>
   <svg class="ic-sol" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg>
@@ -447,5 +453,6 @@ footer p{max-width:80ch}
     mostrar();
   })();
 </script>
+<script src="app-apk.js" data-repo="planilha-mei" data-apk="PlanilhaMEI.apk"></script>
 </body>
 </html>
